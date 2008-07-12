@@ -42,8 +42,7 @@ JWPlayer = {
         this.objSWF = new SWFObject(source,this.idPrefix+"mpl",params.width,params.height,"9",params.bgcolor);
         this.objSWF.addParam("allowscriptaccess","always");
         this.objSWF.addParam("allowfullscreen","true");
-        this.objSWF.addVariable("skin", params.skin);
-        this.objSWF.addParam("flashvars","&file="+link+"&autostart="+params.autostart+"&fullscreen="+params.fullscreen);
+        this.objSWF.addParam("flashvars","&skin="+params.skin+"&file="+link+"&autostart="+params.autostart+"&fullscreen="+params.fullscreen);
         this.objSWF.write(this.idPrefix+"player");
     },
     
