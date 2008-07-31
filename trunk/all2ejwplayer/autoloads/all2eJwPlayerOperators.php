@@ -1,5 +1,6 @@
 <?php
 
+include_once('extension/all2ejwplayer/classes/all2eJwPlayerClass.php');
 class all2eJwPlayerOperators
 {
     /*!
@@ -7,7 +8,7 @@ class all2eJwPlayerOperators
     */
     function all2eJwPlayerOperators()
     {
-        $this->Operators = array('jwplayer');
+        $this->Operators = array('jwplayer', 'jwplayerinline');
     }
 
     /*!
@@ -34,15 +35,22 @@ class all2eJwPlayerOperators
     */
     function namedParameterList()
     {
-        return array(                      
-                      'jwplayer' => array('url' => array( 'type' => 'string',
+        return array( 'jwplayer' => array('url' => array( 'type' => 'string',
                                                               'required' => true,
                                                               'default' => '' ),
-                                           'playerclass' => array(
+                                          'playerclass' => array(
                                                               'type' => 'string',
                                                               'required' => false,
-                                                              'default' => 'standard' )
-                                            ) );
+                                                              'default' => 'Standard' )
+                                            ),
+                      'jwplayerinline' => array('url' => array( 'type' => 'string',
+                                                                'required' => true,
+                                                                'default' => '' ),
+                                          'playerclass' => array( 'type' => 'string',
+                                                                  'required' => false,
+                                                                  'default' => 'Inline' )
+                                            )
+                  );
     }
 
     /*!
@@ -56,40 +64,27 @@ class all2eJwPlayerOperators
         {
             case 'jwplayer':
             {
-                $operatorValue = $this->jwplayer( $namedParameters['url']);
+                $operatorValue = $this->jwplayer( $namedParameters['url'], $namedParameters['playerclass'] );
+            } break;
+            case 'jwplayerinline':
+            {
+                $operatorValue = $this->jwplayerinline( $namedParameters['url'], $namedParameters['playerclass'] );
             } break;
         }
     }
 
-    function jwplayer( $url )
+    function jwplayer( $url, $class )
     { 
-        $ini                    = eZINI::instance( "all2ejwplayerclasses.ini" );                          
-        $width                  = $ini->variable( "Standard", "Width" );
-        $height                 = $ini->variable( "Standard", "Height" );
-        $autostart              = $ini->variable( "Standard", "Autostart" );
-        $source                 = $ini->variable( "Standard", "Source" );
-        $fullscreen             = $ini->variable( "Standard", "Fullscreen" );
-        $skin                   = $ini->variable( "Standard", "Skin" );
-        $bgcolor                = $ini->variable( "Standard", "BgColor" );
-
-        /*
-        $displayclick           = $ini->variable( "Standard", "Displayclick" );
-        $mute                   = $ini->variable( "Standard", "Mute" );
-        $repeat                 = $ini->variable( "Standard", "Repeat" );
-        $shuffle                = $ini->variable( "Standard", "Shuffle" );
-        */
-
-        // var so = new SWFObject('http://www.jeroenwijering.com/embed/player.swf','mpl','200','200','9');
-        // so.addParam('allowscriptaccess','always');
-        // so.addParam('allowfullscreen','true');
-        // so.addParam('flashvars','&file=/upload/flash.flv&autostart=true&displayclick=fullscreen&fullscreen=true&mute=true&repeat=true&shuffle=true');
-        // so.write('player');
-        
-
-        $returnUrl = 'JWPlayer.play("'.$url.'", "'.$source.'", {width: "'.$width.'",height:"'.$height.'",autostart:"'.$autostart.'",fullscreen:"'.$fullscreen.'",skin:"'.$skin.'",bgcolor:"'.$bgcolor.'"})';
+        $returnUrl = all2eJwPlayerClass::createLightboxUrl( $url, $class );
         return $returnUrl;
     }
-
+    
+    function jwplayerinline( $url, $class )
+    {
+        $returnUrl = all2eJwPlayerClass::createInlineUrl( $url, $class );
+        return $returnUrl;
+    }
+    
     /// \privatesection
     var $Operators;
 }
