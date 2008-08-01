@@ -33,6 +33,7 @@ JWPlayer = {
         this.objPlayerBox.appendChild(this.objOverlay);
         this.objPlayerBox.appendChild(this.objPlayer);
         this.objBody.appendChild(this.objPlayerBox);
+        jwAjaxFunctions.init();
     },
     
     play : function(link,source,params){
@@ -117,6 +118,74 @@ JWPlayer = {
         return arrayPageScroll;
     }
 }
+
+
+jwAjaxFunctions = {
+    request : false,
+    relations : new Array(),
+    
+    sendRequest : function(url,changeFunction,data,method){
+        jwAjaxFunctions.createRequestObject();
+        if(!this.request){
+            return false;
+        }
+        else{
+            var method = method||"post";
+            var data = data||null;
+            
+            if(method != 'post'){
+                url = url+data;
+            }
+            
+            this.request.open(method, url, true);
+            this.request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            this.request.send(data);
+            this.request.onreadystatechange = changeFunction;
+        }
+    },
+    createRequestObject : function(){
+        if(window.XMLHttpRequest){
+            this.request = new XMLHttpRequest;
+        } 
+        else if(window.ActiveXObject){
+            try{
+                this.request = new ActiveXObject("Msxml2.XMLHTTP");
+            } 
+            catch(e){
+                try{
+                    this.request = new ActiveXObject("Microsoft.XMLHTTP");
+                }catch (e){}
+            }
+        }
+    },
+    searchForRelations : function(){
+        var anchors = document.getElementsByTagName("a");
+        for(var i = 0; i < anchors.length; i++) {
+            var anchor = anchors[i];
+            var relAttribute = String(anchor.getAttribute("rel"));
+            if(anchor.getAttribute("href") && relAttribute.toLowerCase().match("jwplayer")){
+                this.relations.push(anchor);
+            }
+        }
+    },
+    init : function(){
+        jwAjaxFunctions.searchForRelations();
+        if(this.relations.length != 0){
+            jwAjaxFunctions.sendRequest("/jwplayer/createurl",jwAjaxFunctions.interpretRequest,this.relations);
+        }
+    },
+    interpretRequest : function(){
+        switch(jwAjaxFunctions.request.readyState)
+        {
+          case 4:
+              if(jwAjaxFunctions.request.status == 200){
+                  //alert(jwAjaxFunctions.request.responseXML);
+              }
+        }
+    }
+}
+
+
 
 window.onload = function(){
     JWPlayer.init();
